@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+     - mongodb
+     - redis
+    environment:
+     SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/test_redis
+     SPRING_DATA_REDIS_HOST: localhost
+     SPRING_DATA_REDIS_PORT: 6379
+     SPRING_DATA_REDIS_PASSWORD: 12345
+    networks:
+    - backend
+
+networks:
+    backend:
+
+volumes:
+    mongodb_data:
